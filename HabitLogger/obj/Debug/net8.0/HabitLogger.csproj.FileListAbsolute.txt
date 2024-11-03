@@ -1,0 +1,14 @@
+/home/lvis/C#/Projects/HabitLogger/HabitLogger/bin/Debug/net8.0/HabitLogger
+/home/lvis/C#/Projects/HabitLogger/HabitLogger/bin/Debug/net8.0/HabitLogger.deps.json
+/home/lvis/C#/Projects/HabitLogger/HabitLogger/bin/Debug/net8.0/HabitLogger.runtimeconfig.json
+/home/lvis/C#/Projects/HabitLogger/HabitLogger/bin/Debug/net8.0/HabitLogger.dll
+/home/lvis/C#/Projects/HabitLogger/HabitLogger/bin/Debug/net8.0/HabitLogger.pdb
+/home/lvis/C#/Projects/HabitLogger/HabitLogger/obj/Debug/net8.0/HabitLogger.GeneratedMSBuildEditorConfig.editorconfig
+/home/lvis/C#/Projects/HabitLogger/HabitLogger/obj/Debug/net8.0/HabitLogger.AssemblyInfoInputs.cache
+/home/lvis/C#/Projects/HabitLogger/HabitLogger/obj/Debug/net8.0/HabitLogger.AssemblyInfo.cs
+/home/lvis/C#/Projects/HabitLogger/HabitLogger/obj/Debug/net8.0/HabitLogger.csproj.CoreCompileInputs.cache
+/home/lvis/C#/Projects/HabitLogger/HabitLogger/obj/Debug/net8.0/HabitLogger.dll
+/home/lvis/C#/Projects/HabitLogger/HabitLogger/obj/Debug/net8.0/refint/HabitLogger.dll
+/home/lvis/C#/Projects/HabitLogger/HabitLogger/obj/Debug/net8.0/HabitLogger.pdb
+/home/lvis/C#/Projects/HabitLogger/HabitLogger/obj/Debug/net8.0/HabitLogger.genruntimeconfig.cache
+/home/lvis/C#/Projects/HabitLogger/HabitLogger/obj/Debug/net8.0/ref/HabitLogger.dll
