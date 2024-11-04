@@ -32,12 +32,32 @@
                         break;
                 }
             }
+
+            IntPtr db;
+            string databasePath = "habit.db";
+
+            // Open SQLite connection
+            int result = SQLiteInterop.sqlite3_open(databasePath, out db);
+            SQLiteInterop.CheckSQLiteError(result, db);
+
+            // Create a table
+            string createTableSQL = "CREATE TABLE IF NOT EXISTS CaffeineTracking (id INTEGER PRIMARY KEY, date TEXT, expresso_number INTEGER);";
+            ExecuteNonQuery(db, createTableSQL);
+
+            // Insert data
+            string insertSQL = "INSERT INTO CaffeineTracking (date, expresso_number) VALUES ('2024-11-03', '2');";
+            ExecuteNonQuery(db, insertSQL);
+
+            // Close SQLite connection
+            SQLiteInterop.sqlite3_close(db);
+
+            Console.WriteLine("Database operations completed successfully.");
         }
 
         static void DisplayMenu()
         {
             Console.Clear();
-            Console.WriteLine("*****    HABIT LOGGER    *****\n");
+            Console.WriteLine("*****    CAFFEINE TRACKER    *****\n");
             Console.WriteLine("C - Create entry");
             Console.WriteLine("R - Read log");
             Console.WriteLine("U - Update entry");
@@ -53,6 +73,21 @@
                 input = Console.ReadLine();
             } while (input is null || !menuOptions.Contains(input.ToLower()));
             return input.ToLower();
+        }
+
+        static void ExecuteNonQuery(IntPtr db, string sql)
+        {
+            IntPtr stmt;
+            int result = SQLiteInterop.sqlite3_prepare_v2(db, sql, sql.Length, out stmt, IntPtr.Zero);
+            SQLiteInterop.CheckSQLiteError(result, db);
+
+            result = SQLiteInterop.sqlite3_step(stmt);
+            if (result != SQLiteInterop.SQLITE_DONE)
+            {
+                SQLiteInterop.CheckSQLiteError(result, db);
+            }
+
+            SQLiteInterop.sqlite3_finalize(stmt);
         }
     }
 }
