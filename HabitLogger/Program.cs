@@ -1,8 +1,18 @@
-﻿namespace HabitLogger
+﻿using System.Runtime.InteropServices;
+
+namespace HabitLogger
 {
+    public class CoffeeLogEntry
+    {
+        public int id { get; set; }
+        public string? date { get; set; }
+        public int expresso_number { get; set; }
+    }
     class Program
     {
         static String[] menuOptions = new string[] {"c", "r", "u", "d", "0", "exit"};
+        static List<CoffeeLogEntry> coffeeLog = new List<CoffeeLogEntry>();
+        
         static void Main(string[] args)
         {
             bool exitProgram = false;
@@ -27,14 +37,19 @@
                 {
                     case "c":
                         string date = GetDateInput();
-                        string message ="\nType number of coffees consumed: ";
+                        string message ="\nType number of coffee drinks consumed: ";
                         int expresso_number = GetIntInput(message);
                         InsertRecord(db, date, expresso_number);
                         PressEnterToContinue();
                         break;
                     case "r":
+                        Console.Clear();
+                        ReadRecords(db);
+                        PressEnterToContinue();
                         break;
                     case "u":
+
+                        PressEnterToContinue();
                         break;
                     case "d":
                         break;                        
@@ -43,7 +58,6 @@
                         exitProgram = true;
                         break;
                     default:
-                        exitProgram = true;
                         break;
                 }
             }
@@ -150,7 +164,34 @@
 
             SQLiteInterop.sqlite3_finalize(stmt);
             Console.WriteLine("\nInserted on Database:");
-            Console.WriteLine($"On {date} consumed {expresso_number} coffees.");
+            Console.WriteLine($"On {date} consumed {expresso_number} coffee drinks.");
+        }
+        static void ReadRecords(IntPtr db)
+        {
+            List<CoffeeLogEntry> auxLog = new List<CoffeeLogEntry>();
+            string selectSQL = "SELECT id, date, expresso_number FROM CaffeineTracking;";
+            IntPtr stmt;
+            int result = SQLiteInterop.sqlite3_prepare_v2(db, selectSQL, selectSQL.Length, out stmt, IntPtr.Zero);
+            SQLiteInterop.CheckSQLiteError(result, db);
+
+            Console.WriteLine("ID \tDate\t\tCoffee Drinks");
+            while ((result = SQLiteInterop.sqlite3_step(stmt)) == SQLiteInterop.SQLITE_ROW)
+            {
+                int id = SQLiteInterop.sqlite3_column_int(stmt, 0);
+                string? date = Marshal.PtrToStringAnsi(SQLiteInterop.sqlite3_column_text(stmt, 1));
+                int expresso_number = SQLiteInterop.sqlite3_column_int(stmt, 2);
+
+                auxLog.Add(new CoffeeLogEntry{ id = id, date = date, expresso_number = expresso_number});
+
+                //Console.WriteLine($"{id}\t{date}\t\t{expresso_number}");
+            }
+            coffeeLog = auxLog;
+            foreach (var logEntry in coffeeLog)
+            {
+                Console.WriteLine($"{logEntry.id}\t{logEntry.date}\t\t{logEntry.expresso_number}");
+            }
+
+            SQLiteInterop.sqlite3_finalize(stmt);
         }
     }
 }
