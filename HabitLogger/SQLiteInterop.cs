@@ -24,6 +24,19 @@ public class SQLiteInterop
     [DllImport(SQLITE_DLL, EntryPoint = "sqlite3_errmsg", CallingConvention = CallingConvention.Cdecl)]
     public static extern IntPtr sqlite3_errmsg(IntPtr db);
 
+    // binding functions to prevent SQL injection
+    [DllImport(SQLITE_DLL, EntryPoint = "sqlite3_bind_text", CallingConvention = CallingConvention.Cdecl)]
+    public static extern int sqlite3_bind_text(IntPtr stmt, int index, string value, int length, IntPtr destructor);
+
+    [DllImport(SQLITE_DLL, EntryPoint = "sqlite3_bind_int", CallingConvention = CallingConvention.Cdecl)]
+    public static extern int sqlite3_bind_int(IntPtr stmt, int index, int value);
+
+    [DllImport(SQLITE_DLL, EntryPoint = "sqlite3_column_text", CallingConvention = CallingConvention.Cdecl)]
+    public static extern IntPtr sqlite3_column_text(IntPtr stmt, int column);
+
+    [DllImport(SQLITE_DLL, EntryPoint = "sqlite3_column_int", CallingConvention = CallingConvention.Cdecl)]
+    public static extern int sqlite3_column_int(IntPtr stmt, int column);
+    
     public const int SQLITE_OK = 0;
     public const int SQLITE_ROW = 100;
     public const int SQLITE_DONE = 101;
