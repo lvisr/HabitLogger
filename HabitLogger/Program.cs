@@ -58,6 +58,9 @@ namespace HabitLogger
                         PressEnterToContinue();
                         break;
                     case "d":
+                        string messageDeleteId ="\nWhich record would you like to delete? Type id: ";
+                        int idToDelete = GetIntInput(messageDeleteId);
+                        DeleteRecord(db, idToDelete);
                         PressEnterToContinue();
                         break;                        
                     case "0":
@@ -99,21 +102,28 @@ namespace HabitLogger
             ;
             do
             {
-                Console.Write("\nType desired date with format YYYY-MM-DD:  ");
+                Console.Write("\nType desired date with format YYYY-MM-DD or today:  ");
                 input = Console.ReadLine();
-                
-                if (input is not null && input.Split('-').Length == 3)
+                if (input is not null)
                 {
-                    string[] dateParts = input.Split('-');
-
-                    int year; int month; int day;
-
-                    if (int.TryParse(dateParts[0], out year) && year > 1900 && year <= 2024
-                        && int.TryParse(dateParts[1], out month) && month > 0 && month <= 12
-                        && int.TryParse(dateParts[2], out day) && day > 0 && day <= 31)
+                    if (input.ToLower() == "today")
+                    {
+                        input = DateTime.Now.ToString("yyyy-M-d");
                         validDate = true;
+                    }
+                    else if (input.Split('-').Length == 3)
+                    {
+                        string[] dateParts = input.Split('-');
+
+                        int year; int month; int day;
+
+                        if (int.TryParse(dateParts[0], out year) && year > 1900 && year <= 2024
+                            && int.TryParse(dateParts[1], out month) && month > 0 && month <= 12
+                            && int.TryParse(dateParts[2], out day) && day > 0 && day <= 31)
+                            validDate = true;
+                    }
                 }
-            } while (input is null || input.Split('-').Length != 3 || !validDate);
+            } while (input is null || !validDate);
 
             return input;
         }
@@ -202,7 +212,7 @@ namespace HabitLogger
         }
         static void UpdateRecord(IntPtr db, int id, string newDate, int newDrinksNumber)
         {
-            string updateSQL = "UPDATE CaffeineTracking SET date = @date, drinksNumber = @drinksNumber WHERE id = @id;";
+            string updateSQL = $"UPDATE CaffeineTracking SET date = '{newDate}', drinksNumber = {newDrinksNumber} WHERE id = {id};";
             IntPtr stmt;
             int result = SQLiteInterop.sqlite3_prepare_v2(db, updateSQL, updateSQL.Length, out stmt, IntPtr.Zero);
             SQLiteInterop.CheckSQLiteError(result, db);
@@ -220,6 +230,25 @@ namespace HabitLogger
 
             SQLiteInterop.sqlite3_finalize(stmt);
             Console.WriteLine($"Updated record with ID {id} to:\nOn {newDate} consumed {newDrinksNumber} coffee drinks.");
+        }
+        static void DeleteRecord(IntPtr db, int id)
+        {
+            string deleteSQL = "DELETE FROM CaffeineTracking WHERE id = @id;";
+            IntPtr stmt;
+            int result = SQLiteInterop.sqlite3_prepare_v2(db, deleteSQL, deleteSQL.Length, out stmt, IntPtr.Zero);
+            SQLiteInterop.CheckSQLiteError(result, db);
+
+            // Bind the id parameter
+            SQLiteInterop.sqlite3_bind_int(stmt, 1, id);
+
+            result = SQLiteInterop.sqlite3_step(stmt);
+            if (result != SQLiteInterop.SQLITE_DONE)
+            {
+                SQLiteInterop.CheckSQLiteError(result, db);
+            }
+
+            SQLiteInterop.sqlite3_finalize(stmt);
+            Console.WriteLine($"Deleted record with ID {id}.");
         }
 
     }

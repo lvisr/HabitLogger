@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("HabitLogger")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+c1275cc73fe944fc4217bcad4070a6376e281b63")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+8fd48be6e81546730e497a9a1907b11aaee126d2")]
 [assembly: System.Reflection.AssemblyProductAttribute("HabitLogger")]
 [assembly: System.Reflection.AssemblyTitleAttribute("HabitLogger")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
