@@ -6,7 +6,7 @@ namespace HabitLogger
     {
         public int id { get; set; }
         public string? date { get; set; }
-        public int expresso_number { get; set; }
+        public int drinksNumber { get; set; }
     }
     class Program
     {
@@ -26,7 +26,7 @@ namespace HabitLogger
             SQLiteInterop.CheckSQLiteError(result, db);
 
             // Create a table
-            string createTableSQL = "CREATE TABLE IF NOT EXISTS CaffeineTracking (id INTEGER PRIMARY KEY, date TEXT, expresso_number INTEGER);";
+            string createTableSQL = "CREATE TABLE IF NOT EXISTS CaffeineTracking (id INTEGER PRIMARY KEY, date TEXT, drinksNumber INTEGER);";
             ExecuteNonQuery(db, createTableSQL);
             while (!exitProgram)
             {
@@ -38,8 +38,8 @@ namespace HabitLogger
                     case "c":
                         string date = GetDateInput();
                         string message ="\nType number of coffee drinks consumed: ";
-                        int expresso_number = GetIntInput(message);
-                        InsertRecord(db, date, expresso_number);
+                        int drinksNumber = GetIntInput(message);
+                        InsertRecord(db, date, drinksNumber);
                         PressEnterToContinue();
                         break;
                     case "r":
@@ -48,10 +48,17 @@ namespace HabitLogger
                         PressEnterToContinue();
                         break;
                     case "u":
-
+                        Console.Clear();                       
+                        string messageId ="\nWhich record would you like to update? Type id: ";
+                        int idToUpdate = GetIntInput(messageId);
+                        string newDate = GetDateInput();
+                        string messageNewDrinks ="\nType new number of coffee drinks consumed: ";
+                        int newDrinksNumber = GetIntInput(messageNewDrinks);
+                        UpdateRecord(db, idToUpdate, newDate, newDrinksNumber);
                         PressEnterToContinue();
                         break;
                     case "d":
+                        PressEnterToContinue();
                         break;                        
                     case "0":
                     case "exit":
@@ -145,16 +152,16 @@ namespace HabitLogger
 
             SQLiteInterop.sqlite3_finalize(stmt);
         }
-        static void InsertRecord(IntPtr db, string date, int expresso_number)
+        static void InsertRecord(IntPtr db, string date, int drinksNumber)
         {
-            string insertSQL = $"INSERT INTO CaffeineTracking (date, expresso_number) VALUES ('{date}', '{expresso_number}');";
+            string insertSQL = $"INSERT INTO CaffeineTracking (date, drinksNumber) VALUES ('{date}', '{drinksNumber}');";
             IntPtr stmt;
             int result = SQLiteInterop.sqlite3_prepare_v2(db, insertSQL, insertSQL.Length, out stmt, IntPtr.Zero);
             SQLiteInterop.CheckSQLiteError(result, db);
 
             // Bind the name parameter
             SQLiteInterop.sqlite3_bind_text(stmt, 1, date, -1, IntPtr.Zero);
-            SQLiteInterop.sqlite3_bind_int(stmt, 2, expresso_number);
+            SQLiteInterop.sqlite3_bind_int(stmt, 2, drinksNumber);
 
             result = SQLiteInterop.sqlite3_step(stmt);
             if (result != SQLiteInterop.SQLITE_DONE)
@@ -164,12 +171,12 @@ namespace HabitLogger
 
             SQLiteInterop.sqlite3_finalize(stmt);
             Console.WriteLine("\nInserted on Database:");
-            Console.WriteLine($"On {date} consumed {expresso_number} coffee drinks.");
+            Console.WriteLine($"On {date} consumed {drinksNumber} coffee drinks.");
         }
         static void ReadRecords(IntPtr db)
         {
             List<CoffeeLogEntry> auxLog = new List<CoffeeLogEntry>();
-            string selectSQL = "SELECT id, date, expresso_number FROM CaffeineTracking;";
+            string selectSQL = "SELECT id, date, drinksNumber FROM CaffeineTracking;";
             IntPtr stmt;
             int result = SQLiteInterop.sqlite3_prepare_v2(db, selectSQL, selectSQL.Length, out stmt, IntPtr.Zero);
             SQLiteInterop.CheckSQLiteError(result, db);
@@ -179,19 +186,41 @@ namespace HabitLogger
             {
                 int id = SQLiteInterop.sqlite3_column_int(stmt, 0);
                 string? date = Marshal.PtrToStringAnsi(SQLiteInterop.sqlite3_column_text(stmt, 1));
-                int expresso_number = SQLiteInterop.sqlite3_column_int(stmt, 2);
+                int drinksNumber = SQLiteInterop.sqlite3_column_int(stmt, 2);
 
-                auxLog.Add(new CoffeeLogEntry{ id = id, date = date, expresso_number = expresso_number});
+                auxLog.Add(new CoffeeLogEntry{ id = id, date = date, drinksNumber = drinksNumber});
 
-                //Console.WriteLine($"{id}\t{date}\t\t{expresso_number}");
+                //Console.WriteLine($"{id}\t{date}\t\t{drinksNumber}");
             }
             coffeeLog = auxLog;
             foreach (var logEntry in coffeeLog)
             {
-                Console.WriteLine($"{logEntry.id}\t{logEntry.date}\t\t{logEntry.expresso_number}");
+                Console.WriteLine($"{logEntry.id}\t{logEntry.date}\t\t{logEntry.drinksNumber}");
             }
 
             SQLiteInterop.sqlite3_finalize(stmt);
         }
+        static void UpdateRecord(IntPtr db, int id, string newDate, int newDrinksNumber)
+        {
+            string updateSQL = "UPDATE CaffeineTracking SET date = @date, drinksNumber = @drinksNumber WHERE id = @id;";
+            IntPtr stmt;
+            int result = SQLiteInterop.sqlite3_prepare_v2(db, updateSQL, updateSQL.Length, out stmt, IntPtr.Zero);
+            SQLiteInterop.CheckSQLiteError(result, db);
+
+            // Bind parameters
+            SQLiteInterop.sqlite3_bind_text(stmt, 1, newDate, -1, IntPtr.Zero);
+            SQLiteInterop.sqlite3_bind_int(stmt, 2, newDrinksNumber);
+            SQLiteInterop.sqlite3_bind_int(stmt, 3, id);
+
+            result = SQLiteInterop.sqlite3_step(stmt);
+            if (result != SQLiteInterop.SQLITE_DONE)
+            {
+                SQLiteInterop.CheckSQLiteError(result, db);
+            }
+
+            SQLiteInterop.sqlite3_finalize(stmt);
+            Console.WriteLine($"Updated record with ID {id} to:\nOn {newDate} consumed {newDrinksNumber} coffee drinks.");
+        }
+
     }
 }
